@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Car Job Online 2026 - Secure Version</title>
+    <style>
+        :root {
+            --bg-dark: #121212; --card-bg: #1e1e1e; --primary-red: #d32f2f;
+            --accent-gold: #d4af37; --text-light: #e0e0e0;
+            --status-done: #e8f5e9; --status-cancel: #ffebee;
+            --drv-nut: #2e7d32; --drv-boon: #0277bd; --drv-out: #616161; --drv-proud: #6a1b9a;
+            --line-green: #06C755;
+        }
+        body { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: var(--text-light); min-height: 100vh; }
+        header { background: linear-gradient(135deg, #000, var(--primary-red)); color: var(--accent-gold); padding: 20px; text-align: center; border-bottom: 2px solid var(--accent-gold); }
+        .container { padding: 20px; max-width: 1400px; margin: auto; }
+        .hidden { display: none !important; }
+        .card { background: var(--card-bg); padding: 30px; border-radius: 15px; border: 1px solid var(--accent-gold); max-width: 500px; margin: 40px auto; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .admin-table-wrapper { width: 100%; margin-top: 15px; border-radius: 8px; border: 1px solid var(--accent-gold); overflow: hidden; background: white; }
+        .admin-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .admin-table th { background: #000; color: var(--accent-gold); padding: 12px; font-size: 13px; text-align: center; }
+        .admin-table td { padding: 12px; border-bottom: 1px solid #ddd; color: #000; font-weight: bold; vertical-align: middle; }
+        .col-user { width: 70%; text-align: left !important; padding-left: 20px !important; }
+        .col-action { width: 30%; text-align: center !important; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
+        .day-card { background: var(--card-bg); aspect-ratio: 1 / 0.8; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; border: 1px solid #333; position: relative; transition: 0.3s; }
+        .day-card:hover { border-color: var(--accent-gold); transform: translateY(-3px); background: #252525; }
+        .job-badge { position: absolute; top: 5px; right: 5px; background: var(--accent-gold); color: #000; width: 22px; height: 22px; border-radius: 50%; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+        .table-wrap { background: white; border-radius: 12px; overflow-x: auto; border: 2px solid var(--accent-gold); }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+        th { background: #000; color: var(--accent-gold); padding: 15px 10px; border-bottom: 2px solid var(--accent-gold); font-size: 13px; text-transform: uppercase; }
+        td { padding: 12px 8px; border-bottom: 1px solid #eee; color: #000; text-align: center; vertical-align: middle; font-weight: 500; font-size: 14px; }
+        tr.status-done { background-color: var(--status-done); }
+        tr.status-cancel { background-color: var(--status-cancel); text-decoration: line-through; color: #b71c1c; }
+        .btn { padding: 10px 18px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+        .btn-red { background: var(--primary-red); color: white; }
+        .btn-gold { background: var(--accent-gold); color: black; }
+        .btn-grey { background: #444; color: white; }
+        .btn-line { background: var(--line-green); color: white; }
+        input, select { padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; }
+        .driver-select { width: 110px; border: none; color: white; font-weight: bold; text-align: center; border-radius: 4px; cursor: pointer; }
+        .drv-nut { background: var(--drv-nut); } .drv-boon { background: var(--drv-boon); } 
+        .drv-out { background: var(--drv-out); } .drv-proud { background: var(--drv-proud); }
+        @media print {
+            header, .btn, #adminMenu, select, #mainSaveBtn, #lineNotifyBtn, .btn-red { display: none !important; }
+            body { background: white; }
+            .container { max-width: 100%; padding: 0; }
+            .table-wrap { border: none; }
+            th { border: 1px solid #000; color: black !important; background: #eee !important; }
+            td { border: 1px solid #000; color: black !important; }
+        }
+    </style>
+</head>
+<body>
+<header><h1>PPF MAERIM CAR RENTAL WITH DRIVER SCHEDULE 2026</h1></header>
+<div class="container">
+    <div id="loginPage" class="card">
+        <h2 style="color: var(--accent-gold); margin-bottom: 25px;">SYSTEM ACCESS</h2>
+        <input type="text" id="username" placeholder="Username" style="width: 85%; margin-bottom: 15px;"><br>
+        <input type="password" id="password" placeholder="Password" style="width: 85%; margin-bottom: 25px;"><br>
+        <button onclick="window.handleLogin()" class="btn btn-gold" style="width: 93%;">LOG IN</button>
+    </div>
+    <div id="adminPage" class="hidden">
+        <div class="card">
+            <h2 style="color: var(--accent-gold); margin-top: 0;">USER MANAGEMENT</h2>
+            <div style="display: flex; gap: 8px; margin-bottom: 20px; background: #000; padding: 15px; border-radius: 8px; border: 1px solid var(--accent-gold);">
+                <input type="text" id="newUserId" placeholder="User ID" style="flex: 1;">
+                <input type="password" id="newUserPass" placeholder="Password" style="flex: 1;">
+                <button onclick="window.addUser()" class="btn btn-gold">+ ADD</button>
+            </div>
+            <div class="admin-table-wrapper">
+                <table class="admin-table">
+                    <thead><tr><th class="col-user">User ID</th><th class="col-action">Action</th></tr></thead>
+                    <tbody id="userListTable"></tbody>
+                </table>
+            </div>
+            <button onclick="window.showPage('calendarPage')" class="btn btn-grey" style="margin-top: 25px; width: 100%;">BACK TO CALENDAR</button>
+        </div>
+    </div>
+    <div id="calendarPage" class="hidden">
+        <div id="adminMenu" class="hidden" style="text-align: center; margin-bottom: 20px;">
+            <button onclick="window.showPage('adminPage')" class="btn btn-gold" style="font-size: 12px; border: 1px solid #000;">⚙️ MANAGE USERS</button>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #000; padding: 15px; border-radius: 10px; border-bottom: 2px solid var(--accent-gold);">
+            <h2 style="color: var(--accent-gold); margin: 0;">CAR CALENDAR 2026</h2>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <select id="monthSelect" onchange="window.renderCalendar()" style="background: white; font-weight: bold;"></select>
+                <button onclick="window.handleLogout()" class="btn btn-red">LOGOUT</button>
+            </div>
+        </div>
+        <div id="daysGrid" class="days-grid"></div>
+    </div>
+    <div id="jobPage" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div style="display: flex; gap: 10px;">
+                <button onclick="window.showPage('calendarPage')" class="btn btn-grey">← BACK</button>
+                <button onclick="window.print()" class="btn btn-gold">🖨️ PRINT / PDF</button>
+            </div>
+            <h2 id="jobTitle" style="color: var(--accent-gold); margin: 0; text-shadow: 2px 2px #000;"></h2>
+            <div style="display: flex; gap: 10px;">
+                <button id="lineNotifyBtn" class="btn btn-line" onclick="window.sendToLine()">📲 SEND TO LINE</button>
+                <button id="mainSaveBtn" class="btn btn-gold" onclick="window.saveToFirebase()" style="box-shadow: 0 0 10px var(--accent-gold);">💾 SAVE</button>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table id="jobTable">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">STATUS</th>
+                        <th style="width: 80px;">TIME</th>
+                        <th style="width: 150px;">JOB ORDER</th>
+                        <th style="width: 80px;">ROOM</th>
+                        <th style="width: 80px;">PAX</th>
+                        <th>NAME</th>
+                        <th>LOCATION</th>
+                        <th style="width: 100px;">PRICE</th>
+                        <th style="width: 130px;">DRIVER</th>
+                        <th>NOTE</th>
+                        <th style="width: 70px;">BY</th>
+                        <th style="width: 60px;">DEL</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div style="text-align: center; margin-top: 25px;">
+            <button class="btn btn-red" onclick="window.addRow()" style="padding: 15px 30px; font-size: 16px;">+ ADD NEW JOB</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, onValue, remove, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAN_9qzdGdwzJXHmuIJZMUC_Ahjo7VCRe8",
+        authDomain: "ev-carlendar.firebaseapp.com",
+        databaseURL: "https://ev-carlendar-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "ev-carlendar",
+        storageBucket: "ev-carlendar.firebasestorage.app",
+        messagingSenderId: "849826588580",
+        appId: "1:849826588580:web:ead3c62b6c9391d2f50331",
+        measurementId: "G-XLJEW7H6K6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    window.currentUser = null;
+    window.dbPath = "";
+    const DRIVERS = { "พี่ณัฐ": "nut", "พี่บูรณ์": "boon", "รถนอก": "out", "พราวเมือง": "proud" };
+
+    window.showPage = (pageId) => {
+        document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+        document.getElementById(pageId).classList.remove('hidden');
+        if(pageId === 'calendarPage') window.renderCalendar();
+        if(pageId === 'adminPage') window.loadUsers();
+    };
+
+    window.handleLogin = async () => {
+        const u = document.getElementById('username').value.trim();
+        const p = document.getElementById('password').value.trim();
+        if (u === "Admin" && p === "Evilfart2") {
+            window.currentUser = "Admin";
+            document.getElementById('adminMenu').classList.remove('hidden');
+            window.showPage('calendarPage');
+            initMonthSelect();
+            return;
+        }
+        const userSnap = await get(ref(db, `users/${u}`));
+        if (userSnap.exists() && userSnap.val().pass === p) {
+            window.currentUser = u;
+            document.getElementById('adminMenu').classList.add('hidden');
+            window.showPage('calendarPage');
+            initMonthSelect();
+        } else { alert("Login Failed!"); }
+    };
+
+    window.handleLogout = () => { window.currentUser = null; window.showPage('loginPage'); };
+
+    window.addUser = () => {
+        const id = document.getElementById('newUserId').value.trim();
+        const pass = document.getElementById('newUserPass').value.trim();
+        if(id && pass) set(ref(db, `users/${id}`), { pass: pass }).then(() => {
+            document.getElementById('newUserId').value = '';
+            document.getElementById('newUserPass').value = '';
+        });
+    };
+
+    window.loadUsers = () => {
+        onValue(ref(db, 'users'), (snapshot) => {
+            const users = snapshot.val() || {};
+            const tbody = document.getElementById('userListTable');
+            tbody.innerHTML = Object.keys(users).map(id => `
+                <tr>
+                    <td class="col-user">${id}</td>
+                    <td class="col-action">
+                        <button onclick="window.deleteUser('${id}')" class="btn btn-red" style="padding:4px 10px; font-size:11px;">DEL</button>
+                    </td>
+                </tr>
+            `).join('');
+        });
+    };
+
+    window.deleteUser = (id) => { if(confirm(`Delete ${id}?`)) remove(ref(db, `users/${id}`)); };
+
+    function initMonthSelect() {
+        const sel = document.getElementById('monthSelect');
+        const months = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"];
+        if(sel.options.length === 0) {
+            sel.innerHTML = months.map((m, i) => `<option value="${i}">${m}</option>`).join('');
+            sel.value = new Date().getMonth();
+        }
+    }
+
+    window.renderCalendar = () => {
+        const m = parseInt(document.getElementById('monthSelect').value);
+        const grid = document.getElementById('daysGrid');
+        const daysInMonth = new Date(2026, m + 1, 0).getDate();
+        onValue(ref(db, `jobs/2026/${m + 1}`), (snapshot) => {
+            const monthData = snapshot.val() || {};
+            grid.innerHTML = "";
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dayJobs = monthData[d] || [];
+                const div = document.createElement('div');
+                div.className = 'day-card';
+                div.innerHTML = `<span>${d}</span> ${dayJobs.length > 0 ? `<div class="job-badge">${dayJobs.length}</div>` : ''}`;
+                div.onclick = () => openJobPage(d, m + 1);
+                grid.appendChild(div);
+            }
+        });
+    };
+
+    function openJobPage(d, m) {
+        window.dbPath = `jobs/2026/${m}/${d}`;
+        document.getElementById('jobTitle').innerText = `JOB ORDER: ${d}/${m}/2026`;
+        window.showPage('jobPage');
+        onValue(ref(db, window.dbPath), (snapshot) => {
+            const data = snapshot.val() || [];
+            const tbody = document.querySelector('#jobTable tbody');
+            tbody.innerHTML = "";
+            data.forEach((item) => window.addRow(item));
+        }, { onlyOnce: true });
+    }
+
+    window.addRow = (item = null) => {
+        const tbody = document.querySelector('#jobTable tbody');
+        const tr = document.createElement('tr');
+        const creator = item ? item.user : window.currentUser;
+        const canEdit = (window.currentUser === "Admin" || window.currentUser === creator);
+        
+        tr.setAttribute('data-owner', creator);
+        if(item?.status) tr.className = `status-${item.status}`;
+        
+        tr.innerHTML = `
+            <td>
+                <select ${canEdit ? '' : 'disabled'} onchange="window.updateRowStatus(this)">
+                    <option value="">-</option>
+                    <option value="done" ${item?.status === 'done' ? 'selected' : ''}>✔️</option>
+                    <option value="cancel" ${item?.status === 'cancel' ? 'selected' : ''}>❌</option>
+                </select>
+            </td>
+            ${[0,1,2,3,4,5,6].map(i => `
+                <td ${canEdit ? 'contenteditable="true"' : 'contenteditable="false"'} style="border: 1px solid #ddd;">
+                    ${item ? item.cells[i] : ''}
+                </td>`).join('')}
+            <td>
+                <select class="driver-select" ${canEdit ? '' : 'disabled'} onchange="window.updateDriverStyle(this)">
+                    <option value="">SELECT</option>
+                    ${Object.keys(DRIVERS).map(d => `<option value="${d}" ${item?.cells[7] === d ? 'selected' : ''}>${d}</option>`).join('')}
+                </select>
+            </td>
+            <td ${canEdit ? 'contenteditable="true"' : 'contenteditable="false"'} style="border: 1px solid #ddd;">${item ? item.cells[8] : ''}</td>
+            <td style="color:#d32f2f; font-weight:bold;">${creator}</td>
+            <td>
+                ${canEdit ? `<button class="btn btn-red" style="padding:5px 10px; font-size:10px;" onclick="window.safeRemoveRow(this)">DEL</button>` : ''}
+            </td>
+        `;
+        tbody.appendChild(tr);
+        window.updateDriverStyle(tr.querySelector('.driver-select'));
+    };
+
+    window.safeRemoveRow = (btn) => {
+        const tr = btn.closest('tr');
+        const owner = tr.getAttribute('data-owner');
+        if (window.currentUser === "Admin" || window.currentUser === owner) {
+            tr.remove();
+        } else {
+            alert("คุณไม่มีสิทธิ์ลบรายการของผู้อื่น!");
+        }
+    };
+
+    window.updateRowStatus = (sel) => {
+        const tr = sel.closest('tr');
+        tr.classList.remove('status-done', 'status-cancel');
+        if(sel.value) tr.classList.add(`status-${sel.value}`);
+    };
+
+    window.updateDriverStyle = (sel) => {
+        sel.classList.remove('drv-nut', 'drv-boon', 'drv-out', 'drv-proud');
+        if(DRIVERS[sel.value]) sel.classList.add(`drv-${DRIVERS[sel.value]}`);
+    };
+
+    window.saveToFirebase = async () => {
+        const snapshot = await get(ref(db, window.dbPath));
+        const originalData = snapshot.val() || [];
+        
+        const rows = [...document.querySelectorAll('#jobTable tbody tr')];
+        let newData = rows.map(tr => {
+            const cells = [...tr.querySelectorAll('td')];
+            return {
+                status: tr.querySelector('select').value,
+                cells: [
+                    cells[1].innerText.trim(), cells[2].innerText, cells[3].innerText, 
+                    cells[4].innerText, cells[5].innerText, cells[6].innerText, 
+                    cells[7].innerText, tr.querySelectorAll('select')[1].value, cells[9].innerText
+                ],
+                user: tr.getAttribute('data-owner')
+            };
+        });
+
+        if (window.currentUser !== "Admin") {
+            const othersJobs = originalData.filter(job => job.user !== window.currentUser);
+            const myJobs = newData.filter(job => job.user === window.currentUser);
+            newData = [...othersJobs, ...myJobs];
+        }
+
+        newData.sort((a, b) => (a.cells[0] || "99.99").localeCompare(b.cells[0] || "99.99"));
+
+        set(ref(db, window.dbPath), newData).then(() => {
+            alert("บันทึกสำเร็จ! (รายการของผู้อื่นถูกล็อคไว้ให้คงเดิม)");
+            const d = window.dbPath.split('/');
+            openJobPage(d[3], d[2]);
+        });
+    };
+
+    // --- ฟังก์ชันส่งงานเข้า LINE ---
+    window.sendToLine = async () => {
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbx-Dviqe6HzDslsK4UYnLlQPu93skOwCXqfgzqrpJRJpVLjWD8a0N34Kr-PsYEk5F8Zvw/exec'; 
+
+        if (!window.dbPath) {
+            alert("กรุณาเลือกวันที่ก่อนส่งครับ");
+            return;
+        }
+
+        const dateParts = window.dbPath.split('/'); // jobs/2026/m/d
+        const displayDate = `${dateParts[3]}/${dateParts[2]}/2026`;
+        const rows = [...document.querySelectorAll('#jobTable tbody tr')];
+        let jobDetails = "";
+        
+        rows.forEach((tr, index) => {
+            const cells = tr.querySelectorAll('td');
+            const status = tr.querySelector('select').value === 'cancel' ? '❌ [ยกเลิก]' : '';
+            const time = cells[1].innerText.trim();
+            const job = cells[2].innerText.trim();
+            const driver = tr.querySelectorAll('select')[1].value;
+            if(job) {
+                jobDetails += `\n${index + 1}. ${status} [${time}] ${job} (${driver})`;
+            }
+        });
+
+        if (!jobDetails) {
+            alert("ไม่มีข้อมูลงานให้ส่งครับ");
+            return;
+        }
+
+        const message = `\n🔔 รายงานงานรถเช่า\n📅 วันที่: ${displayDate}\n👤 โดย: ${window.currentUser}\n--- รายการงาน ---${jobDetails}\n\nเช็คตาราง: https://northkr.github.io/PPF_CarSCHdule/`;
+
+        try {
+            const btn = document.getElementById('lineNotifyBtn');
+            const originalText = btn.innerText;
+            btn.innerText = "⌛ กำลังส่ง...";
+            btn.disabled = true;
+
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify({ message: message })
+            });
+
+            alert("ส่งข้อมูลเข้า LINE สำเร็จ! ✅");
+            btn.innerText = originalText;
+            btn.disabled = false;
+        } catch (error) {
+            alert("เกิดข้อผิดพลาดในการส่ง: " + error.message);
+            document.getElementById('lineNotifyBtn').disabled = false;
+        }
+    };
+</script>
+</body>
+</html>
