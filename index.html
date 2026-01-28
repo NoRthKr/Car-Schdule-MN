@@ -336,58 +336,68 @@
         });
     };
 
-    // --- ฟังก์ชันส่งงานเข้า LINE ---
-    window.sendToLine = async () => {
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbx-Dviqe6HzDslsK4UYnLlQPu93skOwCXqfgzqrpJRJpVLjWD8a0N34Kr-PsYEk5F8Zvw/exec'; 
+    // --- ฟังก์ชันส่งงานเข้า LINE ---
+window.sendToLine = async () => {
+    // *** อย่าลืมเปลี่ยน URL เป็น URL ใหม่ที่ได้จากการ Deploy GAS ครั้งล่าสุด ***
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx-Dviqe6HzDslsK4UYnLlQPu93skOwCXqfgzqrpJRJpVLjWD8a0N34Kr-PsYEk5F8Zvw/exec'; 
 
-        if (!window.dbPath) {
-            alert("กรุณาเลือกวันที่ก่อนส่งครับ");
-            return;
-        }
+    if (!window.dbPath) {
+        alert("กรุณาเลือกวันที่ก่อนส่งครับ");
+        return;
+    }
 
-        const dateParts = window.dbPath.split('/'); // jobs/2026/m/d
-        const displayDate = `${dateParts[3]}/${dateParts[2]}/2026`;
-        const rows = [...document.querySelectorAll('#jobTable tbody tr')];
-        let jobDetails = "";
+    const dateParts = window.dbPath.split('/'); // jobs/2026/m/d
+    const displayDate = `${dateParts[3]}/${dateParts[2]}/2026`;
+    const rows = [...document.querySelectorAll('#jobTable tbody tr')];
+    
+    // ดึงข้อมูลแต่ละแถวใส่ใน Array
+    let jobsArray = [];
+    rows.forEach((tr) => {
+        const cells = tr.querySelectorAll('td');
+        const time = cells[1].innerText.trim();
+        const order = cells[2].innerText.trim();
+        const driver = tr.querySelectorAll('select')[1].value;
+        const status = tr.querySelector('select').value;
         
-        rows.forEach((tr, index) => {
-            const cells = tr.querySelectorAll('td');
-            const status = tr.querySelector('select').value === 'cancel' ? '❌ [ยกเลิก]' : '';
-            const time = cells[1].innerText.trim();
-            const job = cells[2].innerText.trim();
-            const driver = tr.querySelectorAll('select')[1].value;
-            if(job) {
-                jobDetails += `\n${index + 1}. ${status} [${time}] ${job} (${driver})`;
-            }
+        if(order) {
+            jobsArray.push({
+                time: time,
+                order: order,
+                driver: driver,
+                status: status
+            });
+        }
+    });
+
+    if (jobsArray.length === 0) {
+        alert("ไม่มีข้อมูลงานให้ส่งครับ");
+        return;
+    }
+
+    try {
+        const btn = document.getElementById('lineNotifyBtn');
+        btn.innerText = "⌛ กำลังส่ง Flex...";
+        btn.disabled = true;
+
+        await fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors', // เนื่องจากเป็น Web App ของ GAS
+            body: JSON.stringify({ 
+                date: displayDate,
+                user: window.currentUser,
+                jobs: jobsArray 
+            })
         });
 
-        if (!jobDetails) {
-            alert("ไม่มีข้อมูลงานให้ส่งครับ");
-            return;
-        }
-
-        const message = `\n🔔 รายงานงานรถเช่า\n📅 วันที่: ${displayDate}\n👤 โดย: ${window.currentUser}\n--- รายการงาน ---${jobDetails}\n\nเช็คตาราง: https://northkr.github.io/PPF_CarSCHdule/`;
-
-        try {
-            const btn = document.getElementById('lineNotifyBtn');
-            const originalText = btn.innerText;
-            btn.innerText = "⌛ กำลังส่ง...";
-            btn.disabled = true;
-
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ message: message })
-            });
-
-            alert("ส่งข้อมูลเข้า LINE สำเร็จ! ✅");
-            btn.innerText = originalText;
-            btn.disabled = false;
-        } catch (error) {
-            alert("เกิดข้อผิดพลาดในการส่ง: " + error.message);
-            document.getElementById('lineNotifyBtn').disabled = false;
-        }
-    };
+        alert("ส่ง Flex Message เข้า LINE สำเร็จ! ✅");
+        btn.innerText = "📲 SEND TO LINE";
+        btn.disabled = false;
+    } catch (error) {
+        alert("เกิดข้อผิดพลาด: " + error.message);
+        document.getElementById('lineNotifyBtn').disabled = false;
+    }
+        
+ };
 </script>
 </body>
 </html>
