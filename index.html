@@ -336,66 +336,60 @@
         });
     };
 
-    // --- ฟังก์ชันส่งงานเข้า LINE ---
-
+    // --- ฟังก์ชันส่งงานเข้า LINE ---\
 window.sendToLine = async () => {
-    // *** อย่าลืมเปลี่ยน URL เป็น URL ใหม่ที่ได้จากการ Deploy GAS ครั้งล่าสุด ***
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbx-Dviqe6HzDslsK4UYnLlQPu93skOwCXqfgzqrpJRJpVLjWD8a0N34Kr-PsYEk5F8Zvw/exec'; 
+    const scriptURL = 'YOUR_GAS_WEB_APP_URL'; // ใส่ URL ของคุณที่นี่
 
     if (!window.dbPath) {
         alert("กรุณาเลือกวันที่ก่อนส่งครับ");
         return;
     }
 
-    const dateParts = window.dbPath.split('/'); // jobs/2026/m/d
+    const dateParts = window.dbPath.split('/');
     const displayDate = `${dateParts[3]}/${dateParts[2]}/2026`;
     const rows = [...document.querySelectorAll('#jobTable tbody tr')];
     
-    // ดึงข้อมูลแต่ละแถวใส่ใน Array
     let jobsArray = [];
     rows.forEach((tr) => {
         const cells = tr.querySelectorAll('td');
-        const time = cells[1].innerText.trim();
-        const order = cells[2].innerText.trim();
         const driver = tr.querySelectorAll('select')[1].value;
-        const status = tr.querySelector('select').value;
-        
-        if(order) {
+        if(cells[2].innerText.trim()) {
             jobsArray.push({
-                time: time,
-                order: order,
-                driver: driver,
-                status: status
+                time: cells[1].innerText.trim(),
+                order: cells[2].innerText.trim(),
+                driver: driver || "ยังไม่ระบุ",
+                status: tr.querySelector('select').value
             });
         }
     });
 
-    if (jobsArray.length === 0) {
-        alert("ไม่มีข้อมูลงานให้ส่งครับ");
-        return;
-    }
+    if (jobsArray.length === 0) return alert("ไม่มีข้อมูลงานให้ส่งครับ");
 
     try {
         const btn = document.getElementById('lineNotifyBtn');
-        btn.innerText = "⌛ กำลังส่ง Flex...";
+        btn.innerText = "⌛ กำลังส่ง...";
         btn.disabled = true;
 
+        // ใช้การส่งแบบ POST พร้อมส่งข้อมูลในรูปแบบ JSON string
         await fetch(scriptURL, {
             method: 'POST',
-            mode: 'no-cors', // เนื่องจากเป็น Web App ของ GAS
-            body: JSON.stringify({ 
+            mode: 'cors', // เปลี่ยนเป็น cors
+            headers: { 'Content-Type': 'text/plain' }, // ป้องกันการติด Preflight CORS
+            body: JSON.stringify({
                 date: displayDate,
                 user: window.currentUser,
-                jobs: jobsArray 
+                jobs: jobsArray
             })
         });
 
-        alert("ส่ง Flex Message เข้า LINE สำเร็จ! ✅");
+        alert("ส่งข้อมูลเข้า LINE เรียบร้อยแล้ว! ✅");
+    } catch (error) {
+        console.error(error);
+        alert("อาจจะส่งสำเร็จแล้วแต่ติด CORS หรือเกิดข้อผิดพลาด: " + error.message);
+    } finally {
+        const btn = document.getElementById('lineNotifyBtn');
         btn.innerText = "📲 SEND TO LINE";
         btn.disabled = false;
-    } catch (error) {
-        alert("เกิดข้อผิดพลาด: " + error.message);
-        document.getElementById('lineNotifyBtn').disabled = false;
     }
         
  };
@@ -403,3 +397,4 @@ window.sendToLine = async () => {
 </body>
 
 </html>
+
