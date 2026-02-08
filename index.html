@@ -267,26 +267,33 @@
         });
     };
 
-    function openJobPage(d, m, y) {
-        window.currentDatePath = `${y}/${m}/${d}`;
-        window.dbPath = `jobs/${window.currentDatePath}`;
-        document.getElementById('jobTitle').innerText = `วันที่ ${d}/${m}/${y}`;
-        window.showPage('jobPage');
-        
-        onValue(ref(db, window.dbPath), (snap) => {
-            const raw = snap.val();
-            let jobs = [], logs = [];
-            if (Array.isArray(raw)) { jobs = raw; } 
-            else if (raw && raw.data) { jobs = raw.data; logs = raw.logs || []; }
+function openJobPage(d, m, y) {
+    window.currentDatePath = `${y}/${m}/${d}`;
+    window.dbPath = `jobs/${window.currentDatePath}`;
+    document.getElementById('jobTitle').innerText = `วันที่ ${d}/${m}/${y}`;
+    window.showPage('jobPage');
+    
+    onValue(ref(db, window.dbPath), (snap) => {
+        const raw = snap.val();
+        let jobs = [], logs = [];
+        if (Array.isArray(raw)) { jobs = raw; } 
+        else if (raw && raw.data) { jobs = raw.data; logs = raw.logs || []; }
 
-            const tbody = document.querySelector('#jobTable tbody');
-            tbody.innerHTML = "";
-            jobs.forEach(item => window.addRow(item));
-            
-            const logBox = document.getElementById('logContent');
-            logBox.innerHTML = logs.slice().reverse().map(l => `<div>[${l.time}] <b>${l.user}</b>: ${l.msg}</div>`).join('');
-        }, { onlyOnce: true });
-    }
+        // --- ส่วนที่เพิ่ม: สั่งให้เรียงลำดับตาม "เวลา" (คอลัมน์แรก) ---
+        jobs.sort((a, b) => {
+            const timeA = a.cells[0] || "";
+            const timeB = b.cells[0] || "";
+            return timeA.localeCompare(timeB);
+        });
+
+        const tbody = document.querySelector('#jobTable tbody');
+        tbody.innerHTML = "";
+        jobs.forEach(item => window.addRow(item));
+        
+        const logBox = document.getElementById('logContent');
+        logBox.innerHTML = logs.slice().reverse().map(l => `<div>[${l.time}] <b>${l.user}</b>: ${l.msg}</div>`).join('');
+    }, { onlyOnce: true });
+}
 
     window.addRow = (item = null) => {
         const tbody = document.querySelector('#jobTable tbody');
