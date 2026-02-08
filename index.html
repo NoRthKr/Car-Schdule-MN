@@ -58,7 +58,7 @@
 <body>
 
 <header>
-    <h1>PPF MAERIM CAR RENTAL (2026-2030)</h1>
+    <h1>PPF MAERIM CAR RENTAL ตารางคิวรถ แม่ริม</h1>
 </header>
 
 <div class="container">
@@ -78,7 +78,7 @@
             <div style="display: flex; gap: 12px; align-items: center;">
                 <select id="yearSelect" onchange="window.renderCalendar()" style="padding: 10px; border-radius: 8px; background: #1e293b; color: white;"></select>
                 <select id="monthSelect" onchange="window.renderCalendar()" style="padding: 10px; border-radius: 8px; background: #1e293b; color: white;"></select>
-                <button onclick="window.goToSummary()" class="btn btn-gold">📊 สรุปรายเดือน</button>
+                <button onclick="window.goToSummary()" class="btn btn-gold">📊 สรุปงานรายเดือน</button>
                 <button onclick="window.handleLogout()" class="btn btn-red">ออกจากระบบ</button>
             </div>
         </div>
@@ -91,7 +91,7 @@
     <div id="jobPage" class="hidden">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <div style="display: flex; gap: 10px;">
-                <button onclick="history.back()" class="btn btn-grey">← กลับ</button>
+                <button onclick="history.back()" class="btn btn-grey">← ย้อนกลับ</button>
                 <button onclick="window.print()" class="btn btn-gold">🖨️ PRINT</button>
             </div>
             <h2 id="jobTitle" style="color: var(--accent-gold); margin: 0;"></h2>
@@ -107,12 +107,12 @@
                         <th style="width: 60px;">ห้อง</th>
                         <th style="width: 50px;">PAX</th>
                         <th>ชื่อลูกค้า</th>
-                        <th>สถานที่ไป</th>
+                        <th>สถานที่</th>
                         <th style="width: 100px;">ราคา</th>
                         <th style="width: 130px;">คนขับ</th>
-                        <th style="width: 130px;">พนักงานขาย</th>
+                        <th style="width: 130px;">คนขาย</th>
                         <th>หมายเหตุ</th>
-                        <th style="width: 80px;">ผู้ลง</th>
+                        <th style="width: 80px;">ผู้ลงระบบ</th>
                         <th style="width: 40px;" class="no-print">ลบ</th>
                     </tr>
                 </thead>
@@ -120,7 +120,7 @@
             </table>
         </div>
         <div style="text-align: center; margin-top: 20px;" class="no-print">
-            <button class="btn btn-red" onclick="window.addRow()" style="padding: 12px 30px; border-radius: 50px;">+ เพิ่มรายการงาน</button>
+            <button class="btn btn-red" onclick="window.addRow()" style="padding: 12px 30px; border-radius: 50px;">+ เพิ่มรายการ</button>
         </div>
         <div class="log-container no-print" id="logBox">
             <strong style="color: var(--accent-gold);">📜 ประวัติการแก้ไข (Edit Logs):</strong>
@@ -135,14 +135,14 @@
                 <table id="summaryTable">
                     <thead>
                         <tr>
-                            <th>วันที่</th><th>สถานะ</th><th>เวลา</th><th>เลขงาน/ไฟล์</th><th>ห้อง</th><th>PAX</th><th>ลูกค้า</th><th>สถานที่</th><th>ราคา</th><th>คนขับ</th><th>คนขาย</th>
+                            <th>วันที่</th><th>สถานะ</th><th>เวลา</th><th>JobOrder</th><th>ห้อง</th><th>PAX</th><th>ลูกค้า</th><th>สถานที่</th><th>ราคา</th><th>คนขับ</th><th>คนขาย</th>
                         </tr>
                     </thead>
                     <tbody id="summaryBody"></tbody>
                 </table>
             </div>
             <div id="totalIncomeBox" style="margin-top: 20px; text-align: right; font-size: 24px; color: var(--accent-gold); font-weight: bold;"></div>
-            <button onclick="history.back()" class="btn btn-grey" style="margin-top: 20px; width: 100%;">กลับ</button>
+            <button onclick="history.back()" class="btn btn-grey" style="margin-top: 20px; width: 100%;">ย้อนกลับ</button>
         </div>
     </div>
 </div>
@@ -364,7 +364,7 @@
                 tbody.appendChild(tr);
             });
         });
-        document.getElementById('summaryTitle').innerText = `สรุปรายรับเดือน ${m}/${y}`;
+        document.getElementById('summaryTitle').innerText = `สรุปคิวรถเดือน ${m}/${y}`;
         document.getElementById('totalIncomeBox').innerText = `รายรับรวม: ${total.toLocaleString()} บาท`;
     };
 </script>
